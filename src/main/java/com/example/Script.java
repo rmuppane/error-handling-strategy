@@ -12,12 +12,14 @@ public class Script {
     }
 
     public static void decreaseRetry(ProcessContext kcontext) {
+        var retryOnError = (String) kcontext.getVariable("RetryOnError");
+        var retryOnErrorInt = Integer.parseInt(retryOnError)-1;
+        kcontext.setVariable("RetryOnError", Integer.toString(retryOnErrorInt));
         ProcessWorkItemHandlerException pwihe = (ProcessWorkItemHandlerException) kcontext.getVariable("Error");
-        var retry = pwihe.getRetries() - 1;
-        if (retry > 0) {
-            pwihe = new ProcessWorkItemHandlerException(pwihe.getProcessId(), ProcessWorkItemHandlerException.HandlingStrategy.RETRY, pwihe.getCause(), retry);
+        if (retryOnErrorInt > 0) {
+            pwihe = new ProcessWorkItemHandlerException(pwihe.getProcessId(), ProcessWorkItemHandlerException.HandlingStrategy.RETRY, pwihe.getCause(), retryOnErrorInt);
             kcontext.setVariable("Error", pwihe);                
         }
-        kcontext.setVariable("retry", retry);
+        kcontext.setVariable("retry", retryOnErrorInt);
     }
 }
